@@ -5,6 +5,9 @@ using System.Text;
 
 namespace RomRight.ConsoleHelper
 {
+    /// <summary>
+    /// Configuration de l'affichage de la console.
+    /// </summary>
     public static class Config
     {
         public static ConsoleColor COLOR_BACKGROUND = ConsoleColor.White;

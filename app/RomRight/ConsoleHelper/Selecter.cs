@@ -5,14 +5,28 @@ using System.Text;
 
 namespace RomRight.ConsoleHelper
 {
+    /// <summary>
+    /// Permet de simplifier la sélection utilisateur en mode console.
+    /// </summary>
     class Selecter
     {
+
+        #region Champs
+
         private ListChoice[] choices;
         private int selectedElement = 0;
         private int cursorPosition = 0;
         private bool enabled = false;
 
+        #endregion
 
+
+        #region Constructeurs
+
+        /// <summary>
+        /// Définit un nouveau sélecteur et l'affiche (sans donner la main à l'utilisateur).
+        /// </summary>
+        /// <param name="choices">La liste des choix proposés à l'utilisateur.</param>
         public Selecter(ListChoice[] choices)
         {
             this.choices = choices;
@@ -24,6 +38,15 @@ namespace RomRight.ConsoleHelper
             Console.CursorTop += choices.Count();
         }
 
+        #endregion
+
+
+        #region Méthodes
+
+        /// <summary>
+        /// Donne la main à l'utilisateur qui doit choisir entre les différents ListChoice.
+        /// </summary>
+        /// <returns>Le ListChoice sélectionné par l'utilisateur.</returns>
         public ListChoice Choose()
         {
             // On garde en mémoire la visibilité du curseur et on l'efface le temps d'afficher la liste
@@ -70,7 +93,9 @@ namespace RomRight.ConsoleHelper
             return choices[selectedElement];
         }
 
-
+        /// <summary>
+        /// Affiche la liste dans la console.
+        /// </summary>
         private void Display()
         {
             Utils.SaveConsoleConfig();
@@ -99,6 +124,7 @@ namespace RomRight.ConsoleHelper
             Utils.RestoreConsoleConfig();
         }
 
-        
+        #endregion
+
     }
 }

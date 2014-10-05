@@ -23,9 +23,7 @@ namespace RomRight
             " |_|  \\_\\___/|_| |_| |_|_|  \\_\\_|\\__, |_| |_|\\__|" + "\n" +
             "                                  __/ |          " + "\n" +
             "                                 |___/   v" + Assembly.GetCallingAssembly().GetName().Version.ToString();
-
-        private static string LOG = "";
-
+        
         private const string DEFAULT_ZONES = "F E UE W U";
 
         [STAThread]
@@ -38,17 +36,21 @@ namespace RomRight
             }
             catch (Exception e)
             {
-                WriteLineInLog("\nUne erreur s'est produite pendant l'exécution de RomRight :");
-                WriteLineInLog(e.Message);
+                Utils.WriteLineInLog("\nUne erreur s'est produite pendant l'exécution de RomRight :");
+                Utils.WriteLineInLog(e.Message);
             }
             // Quoi qu'il arrive, on enregistre un fichier de logs
             finally
             {
-                File.WriteAllText("log.txt", LOG);
+                File.WriteAllText("log.txt", Utils.LOG);
             }
 
         }
 
+        /// <summary>
+        /// Execute le script principal de RomRight.
+        /// </summary>
+        /// <param name="args">Arguments à passer</param>
         private static void ExecRomRight(string[] args)
         {
             Console.Title = "RomRight";
@@ -100,7 +102,7 @@ namespace RomRight
                     // Si l'utilisateur veut sélectionner le dossier des roms via une boite de dialog
                     else if (choice == "dialog")
                     {
-                        romsDirectory = GetDirectoryWithDialog();
+                        romsDirectory = Utils.GetDirectoryWithDialog();
                     }
                 }
 
@@ -146,7 +148,7 @@ namespace RomRight
                     // Si l'utilisateur veut sélectionner le dossier des roms via une boite de dialog
                     else if (choice == "dialog")
                     {
-                        exportDirectory = GetDirectoryWithDialog();
+                        exportDirectory = Utils.GetDirectoryWithDialog();
                     }
                 }
             }
@@ -213,42 +215,13 @@ namespace RomRight
             Console.Write("\nFin du traitement. Appuyez sur une touche pour quitter le programme... ");
             Console.ReadKey();
         }
-
+               
         /// <summary>
-        /// Cette fonction permet d'écrire une ligne à la fois dans la console et dans les logs.
+        /// Script parcourant toutes les roms d'un répertoire.
         /// </summary>
-        /// <param name="line">La ligne de texte à écrire.</param>
-        /// <param name="showInConsole">Indique si on doit l'afficher dans la console ou pas.</param>
-        private static void WriteLineInLog(string line, bool showInConsole = true)
-        {
-            // On écrit la ligne dans les logs
-            LOG += line + "\n";
-
-            if (showInConsole)
-                Console.WriteLine(line);
-        }
-
-        private static string GetDirectoryWithDialog()
-        {
-            string result = null;
-
-            // On va créer et ouvrir la boite de dialog
-            FolderBrowserDialog folderDialog = new FolderBrowserDialog();
-            folderDialog.RootFolder = Environment.SpecialFolder.Desktop;
-            folderDialog.ShowNewFolderButton = true;
-
-            // Par défaut, on se place dans le répertoire où se trouve l'application
-            folderDialog.SelectedPath = Path.GetDirectoryName(Application.ExecutablePath);
-
-            // Si l'utilisateur a sélectionné un dossier et a appuyé sur OK
-            if (folderDialog.ShowDialog() == DialogResult.OK)
-            {
-                result = folderDialog.SelectedPath;
-            }
-
-            return result;
-        }
-
+        /// <param name="romsDirectory">Répertoire contenant toutes les roms.</param>
+        /// <param name="exportDirectory">Répertoire vers lequelle les roms validées seront exportées.</param>
+        /// <param name="worldZones">Zones géographiques à exporter (ex : {"(U)", "(E)"}).</param>
         private static void BrowseRoms(string romsDirectory, string exportDirectory, string[] worldZones)
         {
             // Si le répertoire que l'utilisateur a spécifié n'existe pas, on balance une exception et on l'insulte.
@@ -275,7 +248,7 @@ namespace RomRight
                     if (Console.CursorTop > 700)
                         Console.Clear();
 
-                    WriteLineInLog("\n======= Parcourt de " + romArchive);
+                    Utils.WriteLineInLog("\n======= Parcourt de " + romArchive);
 
                     string[] romFiles;
 
@@ -332,7 +305,7 @@ namespace RomRight
 
                         foreach (RatedRom ratedRom in sortedRomsFiles[uid])
                         {
-                            WriteLineInLog("--- " + ratedRom.Mark + " : " + ratedRom.RomFileName);
+                            Utils.WriteLineInLog("--- " + ratedRom.Mark + " : " + ratedRom.RomFileName);
 
                             // On ignore les roms qui ont une note inférieur à 100
                             // - de 100 = absence de correspondance avec une langue
@@ -389,7 +362,7 @@ namespace RomRight
                     // On affiche tous les fichiers de roms
                     foreach (string romFileName in finalRomList)
                     {
-                        WriteLineInLog("*** " + romFileName);
+                        Utils.WriteLineInLog("*** " + romFileName);
                     }
                 }
             }

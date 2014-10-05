@@ -5,6 +5,9 @@ using System.Text;
 
 namespace RomRight.ConsoleHelper
 {
+    /// <summary>
+    /// Permet de simplifier l'affiche d'une barre de progression en mode console.
+    /// </summary>
     public class ProgressBar
     {
 

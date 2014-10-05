@@ -6,23 +6,50 @@ using System.Text.RegularExpressions;
 
 namespace RomRight
 {
+    /// <summary>
+    /// RatedRom permet d'associer le nom du fichier d'une rom avec la note associée.
+    /// Un algorithme de notation par défaut est disponible via la méthode Rate.
+    /// </summary>
     public class RatedRom
     {
 
+        #region Propriétés
+
+        /// <summary>
+        /// Nom du fichier de la rom
+        /// </summary>
         public string RomFileName { get; set; }
 
+        /// <summary>
+        /// Note attribuée à la rom.
+        /// </summary>
         public int Mark { get; set; }
 
+        #endregion
+
+
+        #region Constructeurs
+
+        /// <summary>
+        /// Instancie une nouvelle rom pouvant être notée.
+        /// </summary>
+        /// <param name="romFileName">Le nom du fichier de la rom.</param>
+        /// <param name="mark">La note de départ.</param>
         public RatedRom(string romFileName, int mark)
         {
             this.RomFileName = romFileName;
             this.Mark = mark;
         }
 
+        #endregion
+
+
+        #region Méthodes
+
         public void Rate(string[] worldZones)
         {
             //////////////////////////////////////////////////////
-            // NOTE PAR ZONE GEOGRAPHIQUE
+            #region Note par zone géographique
             //////////////////////////////////////////////////////
 
             // On va chercher une correspondance avec la zone.
@@ -38,16 +65,20 @@ namespace RomRight
                 }
             }
 
+            #endregion
+
             //////////////////////////////////////////////////////
-            // VALORISATION DES ROMS VERIFIEES
+            #region Valorisation des roms vérifiées
             //////////////////////////////////////////////////////
 
             // On valorise fortemment les rom qui ont été vérifiées et sont certifiées valides (tag [!])
             if (RomFileName.Contains("[!]"))
                 Mark += 50;
 
+            #endregion
+
             //////////////////////////////////////////////////////
-            // VALORISATION DES REVISIONS
+            #region Valorisation des révisions
             //////////////////////////////////////////////////////
 
             // On va attribuer des points aux révisions de roms
@@ -67,42 +98,65 @@ namespace RomRight
                 catch (Exception) { }
             }
 
+            #endregion
+
             //////////////////////////////////////////////////////
-            // PENALISATION DES ROMS PIRATES
+            #region Pénalisation des roms pirates
             //////////////////////////////////////////////////////
 
             // Une rom pirate (tag [p1], [p2]...) est légèrement pénalisée
-            Regex regexPirate = new Regex("\\[p[1-9]*\\]");
+            Regex regexPirate = new Regex("\\[p[1-9]*?\\]");
             if (regexPirate.Match(RomFileName).Captures.Count > 0)
                 Mark -= 5;
 
+            #endregion
+
             //////////////////////////////////////////////////////
-            // PENALISATION DES ROMS MAL DUMPEES
+            #region Pénalisation des roms mal dumpées
             //////////////////////////////////////////////////////
 
             // Une bad rom (tag [b1], [b2]...) est fortemment pénalisée
-            Regex regexBadDump = new Regex("\\[b[1-9]*\\]");
+            Regex regexBadDump = new Regex("\\[b[1-9]*?\\]");
             if (regexBadDump.Match(RomFileName).Captures.Count > 0)
                 Mark -= 50;
 
+            #endregion
+
             //////////////////////////////////////////////////////
-            // PENALISATION DES ROMS AVEC DES FIXS
+            #region Pénalisation des hacks
+            //////////////////////////////////////////////////////
+
+            // Une rom hackée (tag [h1c], [h]...) est fortemment pénalisée.
+            Regex regexHack = new Regex("\\[h.*?\\]");
+            if (regexHack.Match(RomFileName).Captures.Count > 0)
+                Mark -= 50;
+
+            #endregion
+
+            //////////////////////////////////////////////////////
+            #region Pénalisation des roms avec des fixs
             //////////////////////////////////////////////////////
 
             // Une rom fixée (tag [f1], [f2]...) est faiblement pénalisée. On privilégie en effet les roms non modifiées.
-            Regex regexFixed = new Regex("\\[f.*\\]");
+            Regex regexFixed = new Regex("\\[f.*?\\]");
             if (regexFixed.Match(RomFileName).Captures.Count > 0)
                 Mark -= 1;
 
+            #endregion
+
             //////////////////////////////////////////////////////
-            // PENALISATION DES BUNDLES MEGADRIVE
+            #region Pénalisation des bundles MegaDrive
             //////////////////////////////////////////////////////
 
             // Une rom fixée (tag [f1], [f2]...) est faiblement pénalisée. On privilégie en effet les roms non modifiées.
             Regex regexMdBundle = new Regex("\\(MD Bundle\\)");
             if (regexMdBundle.Match(RomFileName).Captures.Count > 0)
                 Mark -= 1;
+
+            #endregion
         }
+
+        #endregion
 
     }
 }
