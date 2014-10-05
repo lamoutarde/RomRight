@@ -55,3 +55,10 @@ Décompressez les fichiers dans un dossier. Vous devriez avoir :
 - 7z.dll
 - SevenZipSharp.dll
 
+Pour utilisez rapidement RomRight, double cliquez sur RomRight.exe et suivez les instructions à l'écran. Vous pouvez choisir les dossiers où se trouvent les roms et où elles vont être exportées après le tri.
+
+Pour une plus grande personnalisation, RomRight s'éxecute également en ligne de commande. Vous pouvez ouvrir une console Windows, vous rendre dans le dossier où se trouve RomRight.exe et faire :
+
+RomRight.exe "chemin/vers/roms/source" "chemin/export/roms"
+
+Lors de l'éxecution du script, si RomRight a un doute sur deux roms, il vous demandera de choisir laquelle vous souhaitez garder.
