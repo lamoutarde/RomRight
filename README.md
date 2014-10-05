@@ -1,7 +1,7 @@
 RomRight
 ==============================================
 
-RomRight est un gestionnaire automatisé de bibliothèque de roms qui va vous simplifier la vie ! Il a été développé pour la création d'un borne d'arcade Raspberry Pi sous RetroPie mais peut être utilisé dans bien d'autres cas.
+RomRight est un gestionnaire automatisé de bibliothèque de roms qui va vous simplifier la vie ! Il a été développé pour la création d'une borne d'arcade Raspberry Pi sous RetroPie mais peut être utilisé dans bien d'autres cas.
 
 Problématique
 --------------------------------------
@@ -26,14 +26,14 @@ Maintenant, imaginez que vous ayez 300 jeux pour la MegaDrive, 300 autres pour l
 La solution
 ---------------------------------------
 
-RomRight est un programme C# (.NET 4.0) s'éxecutant dans la console Windows et qui va s'occuper de choisir pour vous la rom qui correspond la mieux à vos attentes, automatiquement.
+RomRight est un programme C# (.NET 4.0) s'exécutant dans la console Windows et qui va s'occuper de choisir pour vous la rom qui correspond la mieux à vos attentes, automatiquement.
 
 Comment ça marche ?
 ---------------------------------------
 
 Le programme va ouvrir les fichiers 7z dans un dossier que vous pouvez spécifier. Il analyse ensuite tous les noms des roms qui s'y trouvent et leur donne une note en fonction de ce qu'il repère. Par exemple, il donne beaucoup de points aux roms qui ont été vérifiées et pénalise celles qui ont été marquées comme mauvaises.
 
-Il priorétise également les zones géographiques que vous spécifiez. Vous pouvez par exemple préciser que vous préférez les roms Europe (E) mais que s'il n'y en pas, vous vous accomoderez d'une rom USA (U).
+Il priorise également les zones géographiques que vous spécifiez. Vous pouvez par exemple préciser que vous préférez les roms Europe (E) mais que s'il n'y en pas, vous vous accommoderez d'une rom USA (U).
 
 Gestion des variantes
 ---------------------------------------
@@ -55,10 +55,14 @@ Décompressez les fichiers dans un dossier. Vous devriez avoir :
 - 7z.dll
 - SevenZipSharp.dll
 
-Pour utilisez rapidement RomRight, double cliquez sur RomRight.exe et suivez les instructions à l'écran. Vous pouvez choisir les dossiers où se trouvent les roms et où elles vont être exportées après le tri.
+Pour utiliser rapidement RomRight, double cliquez sur RomRight.exe et suivez les instructions à l'écran. Vous pouvez choisir les dossiers où se trouvent les roms, où elles vont être exportées après le tri et les zones à traiter.
 
-Pour une plus grande personnalisation, RomRight s'éxecute également en ligne de commande. Vous pouvez ouvrir une console Windows, vous rendre dans le dossier où se trouve RomRight.exe et faire :
+Pour une plus grande personnalisation, RomRight s'exécute également en ligne de commande. Vous pouvez ouvrir une console Windows, vous rendre dans le dossier où se trouve RomRight.exe et faire :
 
-RomRight.exe "chemin/vers/roms/source" "chemin/export/roms"
+	RomRight.exe "chemin/vers/roms/source" "chemin/export/roms" "zones"
 
-Lors de l'éxecution du script, si RomRight a un doute sur deux roms, il vous demandera de choisir laquelle vous souhaitez garder.
+- **"chemin/vers/roms/source"** correspond au chemin relatif ou absolu vers le dossier contenant tous vos fichiers 7z.
+- **"chemin/export/roms"** correspond au chemin dans lequel RomRight va extraire les roms qu'il aura choisi.
+- **"zones"** correspond aux différentes zones géographiques à exporter, sans parenthèses et séparées par des espaces. Par exemple, pour choisir en premier les roms Europe et se rabattre sur les roms USA et World, vous pouvez entrer "E U W".
+
+Lors de l'exécution du script, si RomRight a un doute sur deux roms, il vous demandera de choisir laquelle vous souhaitez garder.
