@@ -26,6 +26,8 @@ namespace RomRight
 
         private static string LOG = "";
 
+        private const string DEFAULT_ZONES = "F E UE W U";
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -49,6 +51,7 @@ namespace RomRight
 
         private static void ExecRomRight(string[] args)
         {
+            Console.Title = "RomRight";
             Console.WindowHeight = 40;
             Console.WindowWidth = 100;
 
@@ -159,15 +162,54 @@ namespace RomRight
             #region Choix des zones géographiques
             ////////////////////////////////////////////////////////
 
-            string[] worldZones = new string[] { "(F)", "(E)", "(UE)", "(W)", "(U)" };
+            List<string> worldZones = new List<string>();
+            string selectedZones = "";
 
+            // Si l'utilisateur n'a pas passé d'args[2], on va lui demander s'il veut saisir les codes pays
+            if (args.Count() < 2)
+            {
+                // Tant que l'utilisateur n'a rien sélectionné ou rien tappé, on boucle
+                while (selectedZones == "")
+                {
+                    Console.WriteLine("\nQuelles zones doivent-être exportées ?");
+
+                    Selecter selectZones = new Selecter(new ListChoice[] {
+                        new ListChoice("default", "Garder la sélection par défaut pour la France ("+DEFAULT_ZONES+")"),
+                        new ListChoice("manual", "Entrer manuellement les zones à exporter"),
+                        });
+
+                    // S'il souhaite garder le choix par défaut
+                    if (selectZones.Choose().Choice == "default")
+                    {
+                        selectedZones = DEFAULT_ZONES;
+                    }
+                    // S'il veut entrer manuellement les zones
+                    else
+                    {
+                        Console.WriteLine("\nTappez les codes de pays, séparés par des espaces et sans parenthèse (ex : U E) :");
+                        selectedZones = Console.ReadLine();
+                    }
+                }
+            }
+            // Si l'utilisateur a saisi un args[2], on l'utilise pour les zones
+            else
+            {
+                selectedZones = args[2];
+            }
+
+            // On va entourer les zones saisies de parenthèses et les ajouter à la liste des zones définitives
+            foreach (string zoneToAdd in selectedZones.Trim().Split(new char[] { ' ' }))
+            {
+                worldZones.Add("(" + zoneToAdd.Trim() + ")");
+            }
+            
             #endregion
 
 
             // On lance l'algorithme qui va s'occuper des roms
-            BrowseRoms(romsDirectory, exportDirectory, worldZones);
+            BrowseRoms(romsDirectory, exportDirectory, worldZones.ToArray());
 
-
+            Console.Title = "RomRight";
             Console.Write("\nFin du traitement. Appuyez sur une touche pour quitter le programme... ");
             Console.ReadKey();
         }
@@ -216,11 +258,16 @@ namespace RomRight
             // Si le répertoire que l'utilisateur a spécifié n'existe pas, on balance une exception et on l'insulte un peu plus fort.
             if (!Directory.Exists(romsDirectory))
                 throw new Exception("Le répertoire que vous avez spécifié pour l'export n'existe pas. Vous êtes très mauvais.");
-
+            
             // On va parcourir le dossier censé contenir les roms
-            // Par défaut, RomRight cherche un dossier 7z à sa racine mais on peut en spécifier un autre dans args[0]
-            foreach (string romArchive in Directory.GetFiles(romsDirectory))
+            string[] files = Directory.GetFiles(romsDirectory);
+
+            for (int i = 0; i < files.Count(); i++)
             {
+                Console.Title = "RomRight : " + Math.Round(((i / (double)files.Count()) * 100)) + "%";
+
+                string romArchive = files[i];
+
                 if (Path.GetExtension(romArchive) == ".7z")
                 {
                     // Pour éviter une sortie du buffer (fixé à 800) lors des déplacements de curseur
@@ -274,7 +321,7 @@ namespace RomRight
                             ratedRom.Rate(worldZones);
                         }
                     }
-                    
+
                     List<string> finalRomList = new List<string>();
 
                     // On va chercher les roms les plus pertinentes (celles qui ont eu la meilleure note)
@@ -314,9 +361,9 @@ namespace RomRight
                             // On construit le selecteur pour que l'utilisateur choisisse
                             ListChoice[] romChoices = new ListChoice[topRoms.Count()];
 
-                            for (int i = 0; i < topRoms.Count(); i++)
+                            for (int j = 0; j < topRoms.Count(); j++)
                             {
-                                romChoices[i] = new ListChoice(topRoms[i].RomFileName, topRoms[i].RomFileName);
+                                romChoices[j] = new ListChoice(topRoms[j].RomFileName, topRoms[j].RomFileName);
                             }
 
                             Selecter selectBestRom = new Selecter(romChoices);
@@ -344,10 +391,7 @@ namespace RomRight
                     {
                         WriteLineInLog("*** " + romFileName);
                     }
-
-
                 }
-
             }
         }
     }
