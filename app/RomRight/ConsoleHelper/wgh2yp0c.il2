@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RomRight.ConsoleHelper
+{
+    class Selecter
+    {
+
+
+
+
+        public ListChoice Choose(ListChoice[] choices)
+        {
+            // On garde en mémoire la visibilité du curseur et on l'efface le temps d'afficher la liste
+            bool savedCursorVisibility = Console.CursorVisible;
+            Console.CursorVisible = false;
+
+            // On enregistre la position actuelle du curseur comme étant le début de la liste
+            int listBeginPosition = Console.CursorTop;
+            int actualPosition = 0;
+
+            ConsoleKey keyPressed = ConsoleKey.NoName;
+
+            // Tant que l'utilisateur n'appuit pas sur Entrée
+            while (keyPressed != ConsoleKey.Enter)
+            {
+
+                // Si l'utilisateur appuit sur la touche bas
+                if (keyPressed == ConsoleKey.DownArrow)
+                {
+                    // S'il est possible de descendre plus bas, on incrément la position
+                    if (actualPosition < choices.Count() - 1)
+                        actualPosition++;
+                }
+                // Si l'utilisateur appuit sur la touche haut
+                else if (keyPressed == ConsoleKey.UpArrow)
+                {
+                    // Si on peut aller plus haut, on le fait
+                    if (actualPosition > 0)
+                        actualPosition--;
+                }
+
+                Display(choices, listBeginPosition, actualPosition, false);
+
+                // On attend que l'utilisateur appuit sur une touche
+                keyPressed = Console.ReadKey().Key;
+            }
+
+            // On affiche une dernière fois les choix en masquant légèrement ceux qui n'ont pas été sélectionnés
+            Display(choices, listBeginPosition, actualPosition, true);
+
+            // On rétablit la visibilité du curseur à son origine
+            Console.CursorVisible = savedCursorVisibility;
+
+            // On retourne le choix sélectionné par l'utilisateur
+            return choices[actualPosition];
+        }
+
+
+        private void Display(ListChoice[] choices, int listBeginPosition, int selectedPosition, bool disableOther)
+        {
+            ConsoleColor savedTextColor = Console.ForegroundColor;
+
+            // On se replace au début de la liste pour la redessiner
+            Console.SetCursorPosition(0, listBeginPosition);
+
+            // On parcourt tous les choix possibles
+            for (int i = 0; i < choices.Count(); i++)
+            {
+                if (i == selectedPosition)
+                {
+                    Console.ForegroundColor = Config.COLOR_SELECTED_TEXT;
+                    Console.Write(disableOther ? "   " : " * ");
+                }
+                else
+                {
+                    Console.ForegroundColor = disableOther ? Config.COLOR_DISABLED_TEXT : Config.COLOR_MAIN_TEXT;
+                    Console.Write("   ");
+                }
+
+                Console.WriteLine(choices[i].Title);
+            }
+
+            Console.ForegroundColor = savedTextColor;
+        }
+
+        
+    }
+}
