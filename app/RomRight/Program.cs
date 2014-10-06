@@ -237,133 +237,140 @@ namespace RomRight
 
             for (int i = 0; i < files.Count(); i++)
             {
-                Console.Title = "RomRight : " + Math.Round(((i / (double)files.Count()) * 100)) + "%";
-
-                string romArchive = files[i];
-
-                if (Path.GetExtension(romArchive) == ".7z")
+                try
                 {
-                    // Pour éviter une sortie du buffer (fixé à 800) lors des déplacements de curseur
-                    // On clear la console de temps en temps
-                    if (Console.CursorTop > 700)
-                        Console.Clear();
+                    Console.Title = "RomRight : " + Math.Round(((i / (double)files.Count()) * 100)) + "%";
 
-                    Utils.WriteLineInLog("\n======= Parcourt de " + romArchive);
+                    string romArchive = files[i];
 
-                    string[] romFiles;
-
-                    // On récupère tous les fichiers de roms
-                    using (var tmp = new SevenZipExtractor(romArchive))
+                    if (Path.GetExtension(romArchive) == ".7z")
                     {
-                        romFiles = tmp.ArchiveFileNames.ToArray();
-                    }
+                        // Pour éviter une sortie du buffer (fixé à 800) lors des déplacements de curseur
+                        // On clear la console de temps en temps
+                        if (Console.CursorTop > 700)
+                            Console.Clear();
 
-                    // On va créer une liste des variations de roms, regroupées par leur nom commun
-                    // Par exemple, "Sonic 1 [!]" et "Sonic 1 (W) [b1]" seront tous deux rangés sous l'id "Sonic 1"
-                    Dictionary<string, List<RatedRom>> sortedRomsFiles = new Dictionary<string, List<RatedRom>>();
+                        Utils.WriteLineInLog("\n======= Parcourt de " + romArchive);
 
-                    // On va trier les fichiers qu'on a récupéré
-                    foreach (string romFile in romFiles)
-                    {
-                        // Expressions régulières correspondantes aux tags () et []
-                        Regex regexParenthesis = new Regex("\\(.*?\\)");
-                        Regex regexBracket = new Regex("\\[.*?\\]");
+                        string[] romFiles;
 
-                        // On va récupérer les noms des roms sans les variantes () et []
-                        string uid = Path.GetFileNameWithoutExtension(romFile);
-                        uid = regexParenthesis.Replace(uid, "");
-                        uid = regexBracket.Replace(uid, "");
-                        uid = uid.Trim();
-
-                        // Si on a encore jamais croisé cet uid, il faut créer la liste qui va contenir les noms des roms
-                        if (!sortedRomsFiles.ContainsKey(uid))
+                        // On récupère tous les fichiers de roms
+                        using (var tmp = new SevenZipExtractor(romArchive))
                         {
-                            sortedRomsFiles[uid] = new List<RatedRom>();
+                            romFiles = tmp.ArchiveFileNames.ToArray();
                         }
 
-                        // On ajoute le fichier de rom à la liste
-                        sortedRomsFiles[uid].Add(new RatedRom(Path.GetFileName(romFile), 0));
-                    }
+                        // On va créer une liste des variations de roms, regroupées par leur nom commun
+                        // Par exemple, "Sonic 1 [!]" et "Sonic 1 (W) [b1]" seront tous deux rangés sous l'id "Sonic 1"
+                        Dictionary<string, List<RatedRom>> sortedRomsFiles = new Dictionary<string, List<RatedRom>>();
 
-                    // On va lancer le système de notation des roms qui va permettre de choisir automatiquement
-                    // la plus pertinente pour la collection.
-                    foreach (string uid in sortedRomsFiles.Keys)
-                    {
-                        foreach (RatedRom ratedRom in sortedRomsFiles[uid])
+                        // On va trier les fichiers qu'on a récupéré
+                        foreach (string romFile in romFiles)
                         {
-                            ratedRom.Rate(worldZones);
-                        }
-                    }
+                            // Expressions régulières correspondantes aux tags () et []
+                            Regex regexParenthesis = new Regex("\\(.*?\\)");
+                            Regex regexBracket = new Regex("\\[.*?\\]");
 
-                    List<string> finalRomList = new List<string>();
+                            // On va récupérer les noms des roms sans les variantes () et []
+                            string uid = Path.GetFileNameWithoutExtension(romFile);
+                            uid = regexParenthesis.Replace(uid, "");
+                            uid = regexBracket.Replace(uid, "");
+                            uid = uid.Trim();
 
-                    // On va chercher les roms les plus pertinentes (celles qui ont eu la meilleure note)
-                    foreach (string uid in sortedRomsFiles.Keys)
-                    {
-                        List<RatedRom> topRoms = new List<RatedRom>();
-                        int maxMark = 0;
-
-                        foreach (RatedRom ratedRom in sortedRomsFiles[uid])
-                        {
-                            Utils.WriteLineInLog("--- " + ratedRom.Mark + " : " + ratedRom.RomFileName);
-
-                            // On ignore les roms qui ont une note inférieur à 100
-                            // - de 100 = absence de correspondance avec une langue
-                            if (ratedRom.Mark > 100)
+                            // Si on a encore jamais croisé cet uid, il faut créer la liste qui va contenir les noms des roms
+                            if (!sortedRomsFiles.ContainsKey(uid))
                             {
-                                // Si la rom actuelle a une note strictement supérieure au maximum trouvé jusqu'à maintenant
-                                if (ratedRom.Mark > maxMark)
-                                {
-                                    maxMark = ratedRom.Mark;
+                                sortedRomsFiles[uid] = new List<RatedRom>();
+                            }
 
-                                    // On efface toutes les roms de la top list car on a trouvé mieux
-                                    topRoms.Clear();
-                                    topRoms.Add(ratedRom);
-                                }
-                                // Si la rom actuelle a une note identique à celle max trouvée, on ajoute simplement la rom à la liste
-                                else if (ratedRom.Mark == maxMark)
-                                {
-                                    topRoms.Add(ratedRom);
-                                }
+                            // On ajoute le fichier de rom à la liste
+                            sortedRomsFiles[uid].Add(new RatedRom(Path.GetFileName(romFile), 0));
+                        }
+
+                        // On va lancer le système de notation des roms qui va permettre de choisir automatiquement
+                        // la plus pertinente pour la collection.
+                        foreach (string uid in sortedRomsFiles.Keys)
+                        {
+                            foreach (RatedRom ratedRom in sortedRomsFiles[uid])
+                            {
+                                ratedRom.Rate(worldZones);
                             }
                         }
 
-                        // Si l'algorithme n'a pas réussi à départager plusieurs roms, il faut demander à l'utilisateur de choisir manuellement
-                        if (topRoms.Count() > 1)
-                        {
-                            // On construit le selecteur pour que l'utilisateur choisisse
-                            ListChoice[] romChoices = new ListChoice[topRoms.Count()];
+                        List<string> finalRomList = new List<string>();
 
-                            for (int j = 0; j < topRoms.Count(); j++)
+                        // On va chercher les roms les plus pertinentes (celles qui ont eu la meilleure note)
+                        foreach (string uid in sortedRomsFiles.Keys)
+                        {
+                            List<RatedRom> topRoms = new List<RatedRom>();
+                            int maxMark = 0;
+
+                            foreach (RatedRom ratedRom in sortedRomsFiles[uid])
                             {
-                                romChoices[j] = new ListChoice(topRoms[j].RomFileName, topRoms[j].RomFileName);
+                                Utils.WriteLineInLog("--- " + ratedRom.Mark + " : " + ratedRom.RomFileName);
+
+                                // On ignore les roms qui ont une note inférieur à 100
+                                // - de 100 = absence de correspondance avec une langue
+                                if (ratedRom.Mark > 100)
+                                {
+                                    // Si la rom actuelle a une note strictement supérieure au maximum trouvé jusqu'à maintenant
+                                    if (ratedRom.Mark > maxMark)
+                                    {
+                                        maxMark = ratedRom.Mark;
+
+                                        // On efface toutes les roms de la top list car on a trouvé mieux
+                                        topRoms.Clear();
+                                        topRoms.Add(ratedRom);
+                                    }
+                                    // Si la rom actuelle a une note identique à celle max trouvée, on ajoute simplement la rom à la liste
+                                    else if (ratedRom.Mark == maxMark)
+                                    {
+                                        topRoms.Add(ratedRom);
+                                    }
+                                }
                             }
 
-                            Selecter selectBestRom = new Selecter(romChoices);
+                            // Si l'algorithme n'a pas réussi à départager plusieurs roms, il faut demander à l'utilisateur de choisir manuellement
+                            if (topRoms.Count() > 1)
+                            {
+                                // On construit le selecteur pour que l'utilisateur choisisse
+                                ListChoice[] romChoices = new ListChoice[topRoms.Count()];
 
-                            // On récupère la rom choisie par l'utilisateur et on l'ajoute dans la liste finale
-                            ListChoice choosenRom = selectBestRom.Choose();
-                            finalRomList.Add(choosenRom.Choice);
+                                for (int j = 0; j < topRoms.Count(); j++)
+                                {
+                                    romChoices[j] = new ListChoice(topRoms[j].RomFileName, topRoms[j].RomFileName);
+                                }
+
+                                Selecter selectBestRom = new Selecter(romChoices);
+
+                                // On récupère la rom choisie par l'utilisateur et on l'ajoute dans la liste finale
+                                ListChoice choosenRom = selectBestRom.Choose();
+                                finalRomList.Add(choosenRom.Choice);
+                            }
+                            // Si on a qu'une seule rom dans le top, on la prend
+                            else if (topRoms.Count() == 1)
+                            {
+                                finalRomList.Add(topRoms[0].RomFileName);
+                            }
+
                         }
-                        // Si on a qu'une seule rom dans le top, on la prend
-                        else if (topRoms.Count() == 1)
+
+                        // On exporte les roms qui ont été sélectionnées comme les plus pertinentes
+                        using (var tmp = new SevenZipExtractor(romArchive))
                         {
-                            finalRomList.Add(topRoms[0].RomFileName);
+                            tmp.ExtractFiles(exportDirectory, finalRomList.ToArray());
                         }
 
+                        // On affiche tous les fichiers de roms
+                        foreach (string romFileName in finalRomList)
+                        {
+                            Utils.WriteLineInLog("*** " + romFileName);
+                        }
                     }
-
-                    // On exporte les roms qui ont été sélectionnées comme les plus pertinentes
-                    using (var tmp = new SevenZipExtractor(romArchive))
-                    {
-                        tmp.ExtractFiles(exportDirectory, finalRomList.ToArray());
-                    }
-
-                    // On affiche tous les fichiers de roms
-                    foreach (string romFileName in finalRomList)
-                    {
-                        Utils.WriteLineInLog("*** " + romFileName);
-                    }
+                }
+                catch(Exception e)
+                {
+                    Utils.WriteLineInLog("Erreur lors du traitement de la rom : " + e.Message);
                 }
             }
         }
