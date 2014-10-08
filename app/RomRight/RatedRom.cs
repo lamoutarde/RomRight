@@ -48,6 +48,10 @@ namespace RomRight
 
         public void Rate(string[] worldZones)
         {
+            // On donne quelques points par défaut pour éviter que les petites erreurs sur la rom qui enlèvent peu de points
+            // ne la fasse passer en dessous de 0.
+            Mark = 50;
+
             //////////////////////////////////////////////////////
             #region Note par zone géographique
             //////////////////////////////////////////////////////
@@ -152,6 +156,28 @@ namespace RomRight
             Regex regexMdBundle = new Regex("\\(MD Bundle\\)");
             if (regexMdBundle.Match(RomFileName).Captures.Count > 0)
                 Mark -= 1;
+
+            #endregion
+
+            //////////////////////////////////////////////////////
+            #region Pénalisation des roms alternate
+            //////////////////////////////////////////////////////
+
+            // Une rom alternate (tag [a1], [a2]...) est faiblement pénalisée. On privilégie en effet les roms non modifiées.
+            Regex regexAlternate = new Regex("\\[a.*?\\]");
+            if (regexAlternate.Match(RomFileName).Captures.Count > 0)
+                Mark -= 1;
+
+            #endregion
+
+            //////////////////////////////////////////////////////
+            #region Pénalisation des roms overdumped
+            //////////////////////////////////////////////////////
+
+            // Une rom overdumped (tag [o]) est pénalisée.
+            Regex regexOverdumped = new Regex("\\[o.*?\\]");
+            if (regexOverdumped.Match(RomFileName).Captures.Count > 0)
+                Mark -= 10;
 
             #endregion
         }

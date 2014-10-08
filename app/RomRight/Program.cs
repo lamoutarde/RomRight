@@ -245,6 +245,9 @@ namespace RomRight
 
                     if (Path.GetExtension(romArchive) == ".7z")
                     {
+                        // Seuil de note en dessous duquel les roms ne seront pas prises
+                        int threshold = 100;
+
                         // Pour éviter une sortie du buffer (fixé à 800) lors des déplacements de curseur
                         // On clear la console de temps en temps
                         if (Console.CursorTop > 700)
@@ -294,6 +297,14 @@ namespace RomRight
                             foreach (RatedRom ratedRom in sortedRomsFiles[uid])
                             {
                                 ratedRom.Rate(worldZones);
+
+                                // On calcule le seuil de la rom (le plancher de centaines le plus proche de sa note)
+                                // Ex : pour une rom avec une note de 345, on aura 300.
+                                int floorMark = (int)Math.Floor(ratedRom.Mark / 100.0) * 100;
+
+                                // Si le seuil est plus bas, on le réhausse
+                                if (threshold < floorMark)
+                                    threshold = floorMark;
                             }
                         }
 
@@ -309,9 +320,8 @@ namespace RomRight
                             {
                                 Utils.WriteLineInLog("--- " + ratedRom.Mark + " : " + ratedRom.RomFileName);
 
-                                // On ignore les roms qui ont une note inférieur à 100
-                                // - de 100 = absence de correspondance avec une langue
-                                if (ratedRom.Mark > 100)
+                                // On ignore les roms qui ont une note inférieur au seuil
+                                if (ratedRom.Mark >= threshold)
                                 {
                                     // Si la rom actuelle a une note strictement supérieure au maximum trouvé jusqu'à maintenant
                                     if (ratedRom.Mark > maxMark)
