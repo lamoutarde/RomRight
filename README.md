@@ -63,6 +63,17 @@ Pour une plus grande personnalisation, RomRight s'exécute également en ligne d
 
 - **"chemin/vers/roms/source"** correspond au chemin relatif ou absolu vers le dossier contenant tous vos fichiers 7z.
 - **"chemin/export/roms"** correspond au chemin dans lequel RomRight va extraire les roms qu'il aura choisi.
-- **"zones"** correspond aux différentes zones géographiques à exporter, sans parenthèses et séparées par des espaces. Par exemple, pour choisir en premier les roms Europe et se rabattre sur les roms USA et World, vous pouvez entrer "E U W".
+- **"zones"** correspond aux différentes zones géographiques à exporter, sans parenthèses et séparées par des espaces. Vous pouvez également intégrer des patchs de traduction en préfixant le patch d'un +. Par exemple, pour choisir en premier les roms Françaises, puis se rabattre sur les roms patchées en Français puis sur les roms Europe et enfin sur les roms USA et World, vous pouvez entrer "F +Fre E U W".
+
+Par défaut, l'algorithme est réglé sur "F +Fre E UE W U +Eng JU". Il prendra donc dans l'ordre de préférence :
+
+1. Les roms France.
+2. Les roms qui ont été traduites en Français, peu importe la langue d'origine.
+3. Les roms Europe.
+4. Les roms USA/Europe.
+6. Les roms World.
+7. Les roms USA.
+5. Les roms qui ont été traduites en Anglais, peu importe la langue d'origine.
+8. Les roms Japon/USA.
 
 Lors de l'exécution du script, si RomRight a un doute sur deux roms, il vous demandera de choisir laquelle vous souhaitez garder.

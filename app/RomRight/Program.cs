@@ -24,7 +24,7 @@ namespace RomRight
             "                                  __/ |          " + "\n" +
             "                                 |___/   v" + Assembly.GetCallingAssembly().GetName().Version.ToString();
         
-        private const string DEFAULT_ZONES = "F +Fre E UE +Eng W U JU";
+        private const string DEFAULT_ZONES = "F +Fre E UE W U +Eng JU";
 
         [STAThread]
         static void Main(string[] args)
