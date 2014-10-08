@@ -24,7 +24,7 @@ namespace RomRight
             "                                  __/ |          " + "\n" +
             "                                 |___/   v" + Assembly.GetCallingAssembly().GetName().Version.ToString();
         
-        private const string DEFAULT_ZONES = "F E UE W U";
+        private const string DEFAULT_ZONES = "F +Fre E UE +Eng W U JU";
 
         [STAThread]
         static void Main(string[] args)
@@ -164,7 +164,6 @@ namespace RomRight
             #region Choix des zones géographiques
             ////////////////////////////////////////////////////////
 
-            List<string> worldZones = new List<string>();
             string selectedZones = "";
 
             // Si l'utilisateur n'a pas passé d'args[2], on va lui demander s'il veut saisir les codes pays
@@ -198,18 +197,12 @@ namespace RomRight
             {
                 selectedZones = args[2];
             }
-
-            // On va entourer les zones saisies de parenthèses et les ajouter à la liste des zones définitives
-            foreach (string zoneToAdd in selectedZones.Trim().Split(new char[] { ' ' }))
-            {
-                worldZones.Add("(" + zoneToAdd.Trim() + ")");
-            }
-            
+                        
             #endregion
 
 
             // On lance l'algorithme qui va s'occuper des roms
-            BrowseRoms(romsDirectory, exportDirectory, worldZones.ToArray());
+            BrowseRoms(romsDirectory, exportDirectory, selectedZones.Trim().Split(new char[] { ' ' }));
 
             Console.Title = "RomRight";
             Console.Write("\nFin du traitement. Appuyez sur une touche pour quitter le programme... ");
@@ -222,6 +215,7 @@ namespace RomRight
         /// <param name="romsDirectory">Répertoire contenant toutes les roms.</param>
         /// <param name="exportDirectory">Répertoire vers lequelle les roms validées seront exportées.</param>
         /// <param name="worldZones">Zones géographiques à exporter (ex : {"(U)", "(E)"}).</param>
+        /// <param name="patchsToApply">Patchs de traduction à appliquer (ex : {"Fre", "Eng"}).</param>
         private static void BrowseRoms(string romsDirectory, string exportDirectory, string[] worldZones)
         {
             // Si le répertoire que l'utilisateur a spécifié n'existe pas, on balance une exception et on l'insulte.
