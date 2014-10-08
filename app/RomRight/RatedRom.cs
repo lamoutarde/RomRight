@@ -50,7 +50,7 @@ namespace RomRight
         {
             // On donne quelques points par défaut pour éviter que les petites erreurs sur la rom qui enlèvent peu de points
             // ne la fasse passer en dessous de 0.
-            Mark = 50;
+            Mark = 25;
 
             //////////////////////////////////////////////////////
             #region Note par zone géographique
