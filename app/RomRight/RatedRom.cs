@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -157,6 +158,33 @@ namespace RomRight
             #endregion
 
             //////////////////////////////////////////////////////
+            #region Valorisation des versions
+            //////////////////////////////////////////////////////
+
+            // On va attribuer des points aux versions de roms
+            Regex regexVersion = new Regex("\\(V([0-9]*?\\.[0-9]*?)\\)");
+            MatchCollection matchesVersion = regexVersion.Matches(RomFileName);
+            if (matchesVersion.Count > 0)
+            {
+                // On récupère ce qu'il y a après V (supposé être des chiffres point d'autres chiffres)
+                string verNumber = matchesVersion[0].Groups[1].Captures[0].Value;
+
+                try
+                {
+                    // On essaye de transformer le numéro de version en chiffre.
+                    // On multiplie ensuite par 10 et on soustrait 10 au résultat.
+                    // Ainsi, une version 0.3 deviendra 3 puis -7 ce qui pénalisera la rom.
+                    // Une version 1.3 deviendra 13 puis 3 ce qui valorisera la rom.
+                    // Ainsi, on pénalise les roms en dessous de 1.0 et on valorise celles au dessus.
+                    Mark += (int)(double.Parse(verNumber, CultureInfo.InvariantCulture) * 10) - 10;
+                }
+                // Si le numéro de révision n'est pas un nombre, on l'ignore simplement
+                catch (Exception) { }
+            }
+
+            #endregion
+
+            //////////////////////////////////////////////////////
             #region Pénalisation des roms pirates
             //////////////////////////////////////////////////////
 
@@ -172,7 +200,7 @@ namespace RomRight
             //////////////////////////////////////////////////////
 
             // Une bad rom (tag [b1], [b2]...) est fortemment pénalisée
-            Regex regexBadDump = new Regex("\\[b[1-9]*?\\]");
+            Regex regexBadDump = new Regex("\\[b.*?\\]");
             if (regexBadDump.Match(RomFileName).Captures.Count > 0)
                 Mark -= 25;
 
@@ -186,6 +214,17 @@ namespace RomRight
             Regex regexHack = new Regex("\\[h.*?\\]");
             if (regexHack.Match(RomFileName).Captures.Count > 0)
                 Mark -= 15;
+
+            #endregion
+
+            //////////////////////////////////////////////////////
+            #region Pénalisation des roms trained (cheats)
+            //////////////////////////////////////////////////////
+
+            // Une rom trained (tag [t1], [t2]...) est pénalisée.
+            Regex regexTrained = new Regex("\\[t.*?\\]");
+            if (regexTrained.Match(RomFileName).Captures.Count > 0)
+                Mark -= 5;
 
             #endregion
 
